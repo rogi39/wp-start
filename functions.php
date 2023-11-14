@@ -1,9 +1,5 @@
 <?php
 
-get_template_part('functions-default');
-get_template_part('functions-styles');
-get_template_part('functions-menu');
-
-
-
-
+require get_template_directory() . '/functions-default.php';
+require get_template_directory() . '/functions-styles.php';
+require get_template_directory() . '/functions-menu.php';
