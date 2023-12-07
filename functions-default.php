@@ -64,6 +64,7 @@ function pagenavi_pagination($html) {
 	$out = str_replace('<span class=\'extend\'', '<li class="pagination__item"><span class="pagination__link"', $out);
 	$out = str_replace('</span>', '</span></li>', $out);
 	$out = str_replace('</div>', '', $out);
+	// $out = str_replace('?paged=', '', $out);
 
 	return '<ul class="pagination">' . $out . '</ul>';
 }
@@ -107,18 +108,82 @@ add_filter('excerpt_length', function () {
 
 add_filter('excerpt_more', fn () => '...');
 
+// add_action('phpmailer_init', 'smtp_phpmailer_init');
+// function smtp_phpmailer_init($phpmailer) {
+// 	$phpmailer->IsSMTP();
+// 	$phpmailer->CharSet    = 'UTF-8';
+// 	$phpmailer->Host       = 'ssl://smtp.mail.ru';
+// 	$phpmailer->Username   = 'mail@site.ru';
+// 	$phpmailer->Password   = 'pas';
+// 	$phpmailer->SMTPAuth   = true;
+// 	$phpmailer->SMTPSecure = 'ssl';
+// 	$phpmailer->Port       = 465;
+// 	$phpmailer->From       = 'mail@site.ru';
+// 	$phpmailer->FromName   = 'site.ru';
+// 	$phpmailer->isHTML(true);
+// }
 
-function cleanInputs($value = '') {
-	$value = trim($value);
-	$value = stripslashes($value);
-	$value = strip_tags($value);
-	$value = htmlspecialchars($value);
-	return $value;
-}
 
-// новые пользователи наверху
+// редирект со страницы автора
+add_action('template_redirect', function () {
+	if (is_author()) {
+		wp_redirect(home_url());
+		exit;
+	}
+});
+
+
+// новые пользователи наверху в админке
 add_action('users_list_table_query_args', function ($args) {
 	$args['orderby'] = empty($_REQUEST['orderby']) ? 'registered' : $_REQUEST['orderby'];
 	$args['order'] = empty($_REQUEST['order']) ? 'DESC' : $_REQUEST['order'];
 	return $args;
 });
+
+// отклчить xmlrpc
+add_filter('xmlrpc_enabled', '__return_false');
+if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) exit;
+
+
+// очистить логин если правильный в login
+add_action('login_footer', function () {
+?>
+	<script>
+		if (document.getElementById('login_error')) {
+			document.getElementById('user_login').value = '';
+		}
+	</script>
+<?php
+});
+add_filter('login_errors', function () {
+	return "Ошибка";
+});
+
+
+function cleanPostArr($arr) {
+	foreach ($arr as $key => $val) {
+		if (is_array($arr[$key])) {
+			foreach ($arr[$key] as $k => $v) {
+				$arr[$key][$k] = cleanInputs($v);
+			}
+		} else {
+			$arr[$key] = cleanInputs($val);
+		}
+	}
+	return $arr;
+}
+
+function cleanInputs($value = '') {
+	$value = stripslashes($value);
+	$value = strip_tags($value);
+	$value = htmlspecialchars($value);
+	$value = trim($value);
+	return $value;
+}
+
+function getCaptcha($field) {
+	$secret_key = 'key';
+	$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secret_key . "&response=" . $field);
+	$return = json_decode($response);
+	return $return;
+}
