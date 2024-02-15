@@ -84,7 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// $mail->Port = 465;
 	// $mail->Username = 'noreply@domain.ru';
 	// $mail->Password = 'pass';
-	// $mail->setFrom('noreply@domain.ru', 'domain.ru');
+	// // $mail->setFrom('noreply@domain.ru', 'domain.ru');
+	// $mail->From = 'noreply@domain.ru';
+	// $mail->FromName = 'domain.ru';
+	// $mail->Sender = 'noreply@domain.ru';
 	// // $mail->addAddress('sendto');
 	// $mail->addAddress('sendto');
 	// $mail->Subject = 'Письмо с сайта domain.ru';
