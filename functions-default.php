@@ -17,13 +17,14 @@ remove_action('wp_head', 'wp_oembed_add_discovery_links'); //remove alternate
 add_theme_support('post-thumbnails');
 add_filter('use_block_editor_for_post', '__return_false', 10);
 add_theme_support('title-tag');
+add_theme_support('html5', ['script', 'style']);
 
 
 add_filter('style_loader_tag', 'sj_remove_type_attr', 10, 2);
 add_filter('script_loader_tag', 'sj_remove_type_attr', 10, 2);
 add_filter('wp_print_footer_scripts ', 'sj_remove_type_attr', 10, 2);
 function sj_remove_type_attr($tag) {
-	return preg_replace("/type=['\"]text\/(javascript|css)['\"]/", '', $tag);
+	return str_replace('/>', '>', $tag);
 }
 
 function remove_all_images($sizes) {
