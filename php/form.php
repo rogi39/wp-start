@@ -100,7 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// 	$ok = true;
 	// }
 
-	if (mail("sendto@sendto.ru", "Письмо с сайта domain.ru", $message)) {
+
+	$headers = "MIME-Version: 1.0\r\n";
+	$headers .= "Content-type: text/plain; charset=utf-8";
+	if (mail("sendto@sendto.ru", "Письмо с сайта domain.ru", $message, $headers)) {
 		$ok = true;
 	}
 
@@ -108,16 +111,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// $tokenTG = "tokenTG";
 	// $chatIdTG = "chatIdTG";
 	// $arrTG = [
-	// 	'Имя:' => $name,
-	// 	'Телефон:' => $phone,
+	// 	'Имя:' => $name ? $name : '—',
+	// 	'Телефон:' => $phone ? $phone : '—',
 	// ];
 
-	// $txtTG = 'Сообщение с сайта domain.ru. %0A';
+	// $txtTG = "Сообщение с сайта domain.ru. \r\n";
 	// foreach($arrTG as $key => $value) {
-	// 	$txtTG .= "<b>".$key."</b> ".$value."%0A";
+	// 	$txtTG .= "<b>".$key."</b> ".$value."\r\n";
 	// };
 
-	// $sendToTelegram = fopen("https://api.telegram.org/bot{$tokenTG}/sendMessage?chat_id={$chatIdTG}&parse_mode=html&text={$txtTG}","r");
+	$sendToTelegram = file_get_contents("https://api.telegram.org/bot" . $tokenTG . "/sendMessage?chat_id=" . $chatIdTG . "&parse_mode=html&text=" . urlencode($txtTG));
 
 	if ($ok) {
 		http_response_code(200);
