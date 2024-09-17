@@ -63,7 +63,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// $file_tmp  = $_FILES['myFile']['tmp_name'];
 	// $file_name = $_FILES['myFile']['name'];
 
-	$message = "ФИО - " . $name . "\nEmail - " . $email;
+
+	$arrMessage = [
+		'Имя: ' => $name ? $name : '—',
+		'Почта: ' => $email ? $email : '—',
+	];
+
+	$messageTitle = "Сообщение с формы — SiteName.";
+	$message = '';
+	// $messageHtml = '';
+	foreach ($arrMessage as $key => $value) {
+		$message .= $key . $value . "\r\n";
+		// $messageHtml .= "<b>" . $key . "</b>" . $value . "\r\n";
+	};
+
 	// $messageHtml = "
 	// <h2>Новое сообщение</h2>
 	// <b>Имя:</b> $name<br>
@@ -103,24 +116,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 	$headers = "MIME-Version: 1.0\r\n";
 	$headers .= "Content-type: text/plain; charset=utf-8";
-	if (mail("sendto@sendto.ru", "Письмо с сайта domain.ru", $message, $headers)) {
+	if (mail("sendto@sendto.ru", $messageTitle, $message, $headers)) {
 		$ok = true;
 	}
 
+	// $headers = "MIME-Version: 1.0\r\n";
+	// $headers .= "Content-Type: text/html; charset=UTF-8"; // html письмо
+	// if (mail("sendto@sendto.ru", $messageTitle, $messageHtml, $headers)) {
+	// 	$ok = true;
+	// }
 
-	// $tokenTG = "tokenTG";
-	// $chatIdTG = "chatIdTG";
-	// $arrTG = [
-	// 	'Имя:' => $name ? $name : '—',
-	// 	'Телефон:' => $phone ? $phone : '—',
-	// ];
 
-	// $txtTG = "Сообщение с сайта domain.ru. \r\n";
-	// foreach($arrTG as $key => $value) {
-	// 	$txtTG .= "<b>".$key."</b> ".$value."\r\n";
-	// };
-
-	$sendToTelegram = file_get_contents("https://api.telegram.org/bot" . $tokenTG . "/sendMessage?chat_id=" . $chatIdTG . "&parse_mode=html&text=" . urlencode($txtTG));
+	// define('TOKEN_BOT_TG', 'token');
+	// define('CHAT_ID_TG', 'chat_id');
+	// $sendToTelegram = file_get_contents("https://api.telegram.org/bot" . TOKEN_BOT_TG . "/sendMessage?chat_id=" . CHAT_ID_TG . "&parse_mode=html&text=" . urlencode($messageTitle . "\r\n" . $message));
 
 	if ($ok) {
 		http_response_code(200);
