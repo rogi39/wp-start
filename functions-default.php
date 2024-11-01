@@ -104,7 +104,7 @@ add_filter('excerpt_length', function () {
 	return 20;
 });
 
-add_filter('excerpt_more', fn () => '...');
+add_filter('excerpt_more', fn() => '...');
 
 // add_action('phpmailer_init', 'smtp_phpmailer_init');
 // function smtp_phpmailer_init($phpmailer) {
@@ -184,4 +184,22 @@ function getCaptcha($field) {
 	$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secret_key . "&response=" . $field);
 	$return = json_decode($response);
 	return $return;
+}
+
+add_action('init', 'toLowerUrls');
+function toLowerUrls() {
+	$url = $_SERVER['REQUEST_URI'];
+	$params = $_SERVER['QUERY_STRING'];
+	if (preg_match('/[\.]/', $url)) {
+		return;
+	}
+	if (preg_match('/[A-Z]/', $url)) {
+		$lc_url = empty($params)
+			? strtolower($url)
+			: strtolower(substr($url, 0, strrpos($url, '?'))) . '?' . $params;
+		if ($lc_url !== $url) {
+			header('Location: ' . $lc_url, TRUE, 301);
+			exit();
+		}
+	}
 }
