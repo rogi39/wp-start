@@ -203,3 +203,12 @@ function toLowerUrls() {
 		}
 	}
 }
+
+// переименовывет загружаемый файл
+add_filter('sanitize_file_name', 'sanitize_file_name_filter', 10);
+function sanitize_file_name_filter($filename) {
+	$info = pathinfo($filename);
+	$ext  = empty($info['extension']) ? '' : '.' . $info['extension'];
+	$name = basename($filename, $ext) . time();
+	return md5($name) . $ext;
+}
