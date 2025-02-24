@@ -212,3 +212,42 @@ function sanitize_file_name_filter($filename) {
 	$name = basename($filename, $ext) . time();
 	return md5($name) . $ext;
 }
+
+function format_bytes($bytes, $precision = 2) {
+	$units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+	$bytes = max($bytes, 0);
+	$pow   = floor(($bytes ? log($bytes) : 0) / log(1024));
+	$pow   = min($pow, count($units) - 1);
+
+	$bytes /= pow(1024, $pow);
+
+	return round($bytes, $precision) . ' ' . $units[$pow];
+}
+
+
+function phone_format($phone) {
+	$phone = trim($phone);
+
+	$res = preg_replace(
+		array(
+			'/[\+]?([7|8])[-|\s]?\([-|\s]?(\d{3})[-|\s]?\)[-|\s]?(\d{3})[-|\s]?(\d{2})[-|\s]?(\d{2})/',
+			'/[\+]?([7|8])[-|\s]?(\d{3})[-|\s]?(\d{3})[-|\s]?(\d{2})[-|\s]?(\d{2})/',
+			'/[\+]?([7|8])[-|\s]?\([-|\s]?(\d{4})[-|\s]?\)[-|\s]?(\d{2})[-|\s]?(\d{2})[-|\s]?(\d{2})/',
+			'/[\+]?([7|8])[-|\s]?(\d{4})[-|\s]?(\d{2})[-|\s]?(\d{2})[-|\s]?(\d{2})/',
+			'/[\+]?([7|8])[-|\s]?\([-|\s]?(\d{4})[-|\s]?\)[-|\s]?(\d{3})[-|\s]?(\d{3})/',
+			'/[\+]?([7|8])[-|\s]?(\d{4})[-|\s]?(\d{3})[-|\s]?(\d{3})/',
+		),
+		array(
+			'+7 ($2) $3-$4-$5',
+			'+7 ($2) $3-$4-$5',
+			'+7 ($2) $3-$4-$5',
+			'+7 ($2) $3-$4-$5',
+			'+7 ($2) $3-$4',
+			'+7 ($2) $3-$4',
+		),
+		$phone
+	);
+
+	return $res;
+}
