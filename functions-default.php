@@ -251,3 +251,34 @@ function phone_format($phone) {
 
 	return $res;
 }
+
+
+// отключить обновление плагинов
+// add_filter('pre_site_transient_update_plugins', 'pre_site_transient_update_plugins_disable');
+
+function pre_site_transient_update_plugins_disable($value) {
+	static $plugins;
+	$plugins || $plugins = get_plugins();
+
+	$upinfo = new stdClass();
+	$upinfo->last_checked = time();
+	$upinfo->checked = [];
+
+	foreach ($plugins as $file => $p) {
+		$upinfo->checked[$file] = $p['Version'];
+	}
+
+	return $upinfo;
+}
+
+// отключить обновления wp
+// add_filter('pre_site_transient_update_core', 'pre_site_transient_update_core_disable');
+
+function pre_site_transient_update_core_disable($value) {
+	$upinfo = new stdClass();
+	$upinfo->updates = [];
+	$upinfo->version_checked = $GLOBALS['wp_version'];
+	$upinfo->last_checked = time();
+
+	return $upinfo;
+}
