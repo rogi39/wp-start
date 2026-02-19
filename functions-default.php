@@ -118,6 +118,7 @@ add_filter('excerpt_more', fn() => '...');
 // 	$phpmailer->Port       = 465;
 // 	$phpmailer->From       = 'mail@site.ru';
 // 	$phpmailer->FromName   = 'site.ru';
+// 	$phpmailer->Sender     = 'mail@site.ru';
 // 	$phpmailer->isHTML(true);
 // }
 
@@ -159,22 +160,27 @@ add_filter('login_errors', function () {
 
 
 function cleanPostArr($arr) {
+	$result = [];
 	foreach ($arr as $key => $val) {
-		if (is_array($arr[$key])) {
-			foreach ($arr[$key] as $k => $v) {
-				$arr[$key][$k] = cleanInputs($v);
-			}
+		if (is_array($val)) {
+			$result[$key] = cleanPostArr($val);
 		} else {
-			$arr[$key] = cleanInputs($val);
+			$result[$key] = cleanInputs($val);
 		}
 	}
-	return $arr;
+	return $result;
 }
 
 function cleanInputs($value = '') {
+	if ($value === null) {
+		return '';
+	}
+	if (!is_string($value)) {
+		$value = (string)$value;
+	}
 	$value = stripslashes($value);
 	$value = strip_tags($value);
-	$value = htmlspecialchars($value);
+	$value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 	$value = trim($value);
 	return $value;
 }
@@ -184,6 +190,31 @@ function getCaptcha($field) {
 	$response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=" . $secret_key . "&response=" . $field);
 	$return = json_decode($response);
 	return $return;
+}
+
+function check_captcha($token) {
+	$key = 'key';
+	$ch = curl_init();
+	$args = http_build_query([
+		"secret" => $key,
+		"token" => $token,
+		"ip" => $_SERVER['REMOTE_ADDR'],
+	]);
+	curl_setopt($ch, CURLOPT_URL, "https://smartcaptcha.yandexcloud.net/validate?$args");
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+
+	$server_output = curl_exec($ch);
+	$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	curl_close($ch);
+
+	if ($httpcode !== 200) {
+		echo "Allow access due to an error: code=$httpcode; message=$server_output\n";
+		return true;
+	}
+	$resp = json_decode($server_output);
+
+	return $resp->status === "ok";
 }
 
 add_action('init', 'toLowerUrls');
