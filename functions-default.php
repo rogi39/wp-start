@@ -22,7 +22,7 @@ add_theme_support('html5', ['script', 'style']);
 
 add_filter('style_loader_tag', 'sj_remove_type_attr', 10, 2);
 add_filter('script_loader_tag', 'sj_remove_type_attr', 10, 2);
-add_filter('wp_print_footer_scripts ', 'sj_remove_type_attr', 10, 2);
+add_filter('wp_print_footer_scripts', 'sj_remove_type_attr', 10, 2);
 function sj_remove_type_attr($tag) {
 	return str_replace('/>', '>', $tag);
 }
@@ -312,4 +312,29 @@ function pre_site_transient_update_core_disable($value) {
 	$upinfo->last_checked = time();
 
 	return $upinfo;
+}
+
+/* num_word(intval($val), array('балл', 'балла', 'баллов')); */
+function num_word($value, $words, $show = true) {
+	$num = $value % 100;
+	if ($num > 19) {
+		$num = $num % 10;
+	}
+
+	$out = ($show) ?  $value . ' ' : '';
+	switch ($num) {
+		case 1:
+			$out .= $words[0];
+			break;
+		case 2:
+		case 3:
+		case 4:
+			$out .= $words[1];
+			break;
+		default:
+			$out .= $words[2];
+			break;
+	}
+
+	return $out;
 }

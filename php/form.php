@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	// 	$ok = true;
 	// }
 
-
+	$ok = false;
 	$headers = "MIME-Version: 1.0\r\n";
 	$headers .= "Content-type: text/plain; charset=utf-8";
 	if (mail("sendto@sendto.ru", $messageTitle, $message, $headers)) {
